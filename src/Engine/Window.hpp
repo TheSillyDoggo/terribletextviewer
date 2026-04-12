@@ -3,13 +3,17 @@
 #include <string>
 #include <functional>
 
+struct GLFWwindow;
+
 class Window
 {
     protected:
-        void* glfwContext = nullptr;
+        GLFWwindow* glfwContext = nullptr;
         std::string title = "";
         std::function<void()> drawCallback = nullptr;
         static inline Window* instance = nullptr;
+
+        static void onGlfwWindowRefresh(GLFWwindow* window);
 
     public:
         static Window* create(std::function<void()> callback);

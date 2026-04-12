@@ -41,9 +41,6 @@ int main()
     auto shapedText = shaper.shape(*font, "Hello, World私を憎む!");
     auto quads = atlasGroup.buildQuads(*font, shapedText);
 
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.01f);
-
     wnd = Window::create([&wnd, &quads, &atlasGroup]
     {
         static unsigned int id = -1;

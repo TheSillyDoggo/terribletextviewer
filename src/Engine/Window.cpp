@@ -38,8 +38,6 @@ bool Window::init()
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_FOCUSED, 1);
     glfwWindowHint(0x2000C, 1);
 
@@ -49,6 +47,8 @@ bool Window::init()
     {
         return false;
     }
+
+    glfwSetWindowRefreshCallback(glfwContext, onGlfwWindowRefresh);
 
     glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*>(glfwContext));
     glfwSwapInterval(1);
@@ -94,4 +94,10 @@ int Window::getWindowHeight()
     int ret = 0;
     glfwGetWindowSize(reinterpret_cast<GLFWwindow*>(glfwContext), nullptr, &ret);
     return ret;
+}
+
+void Window::onGlfwWindowRefresh(GLFWwindow* window)
+{
+    Window::getInstance()->onDraw();
+    glfwSwapBuffers(window);
 }
