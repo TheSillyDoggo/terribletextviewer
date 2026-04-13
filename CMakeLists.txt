@@ -3,15 +3,23 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(glfwtest)
 
-
-find_package(CURL REQUIRED)
 include(FindPkgConfig)
-
-find_package(glfw3 CONFIG REQUIRED)
-find_package(OpenGL REQUIRED)
-
 include(cmake/CPM.cmake)
 include(FetchContent)
+
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+# find_package(glfw3 CONFIG REQUIRED)
+find_package(OpenGL REQUIRED)
+
+FetchContent_Declare(
+    glfw3
+    GIT_REPOSITORY https://github.com/clear-code/glfw.git
+    GIT_TAG origin/im-support
+)
 
 FetchContent_Declare(
     imgui
@@ -27,6 +35,7 @@ FetchContent_Declare(
 
 CPMAddPackage("gh:prevter/tint@1.0.0")
 
+FetchContent_MakeAvailable(glfw3)
 FetchContent_MakeAvailable(imgui)
 FetchContent_MakeAvailable(fmt)
 

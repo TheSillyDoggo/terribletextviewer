@@ -3,6 +3,8 @@
 #include "Include.hpp"
 #include <Tint/Tint.hpp>
 #include <iostream>
+//#include <FileWatcher.hpp>
+#include <format>
 
 struct Vertex {
     float x, y;
@@ -17,7 +19,7 @@ int main()
 
     // Load the font file
     auto font = tint::Font::loadFile(fl, "../assets/SawarabiGothic-Regular.ttf", tint::FontConfig {
-        .sizePx = 48.f, // Font size in pixels
+        .sizePx = 16.f, // Font size in pixels
         .dpi = 72,      // Font DPI
         
         // Optional features (both are enabled by default, can be omitted here)
@@ -37,35 +39,69 @@ int main()
     );
     
     tint::Shaper shaper;
-    
-    auto shapedText = shaper.shape(*font, "Hello, World私を憎む!");
-    auto quads = atlasGroup.buildQuads(*font, shapedText);
 
-    wnd = Window::create([&wnd, &quads, &atlasGroup]
+    int i = 0;
+
+    /*FileWatcher watch("/home/aster/texteditor/src/Main.cpp");
+
+    watch.setModifyCallback([&i, &watch](const std::filesystem::path& path)
     {
+        i++;
+    });*/
+
+    double fps;
+    double _updateInterval = 0.5f;
+    double _timeLeft = _updateInterval;
+    double _accum = 0;
+    int _frames = 0;
+
+    wnd = Window::create([&wnd, &shaper, &font, &atlasGroup, &watch, &i, &fps, &_updateInterval, &_timeLeft, &_accum, &_frames]
+    {
+        double dt = wnd->getDeltaTime();
+
+        _timeLeft -= dt;
+        _accum += 1 / dt;
+        _frames++;
+
+        if (_timeLeft <= 0)
+        {
+            fps = _accum / _frames;
+
+            _timeLeft = _updateInterval;
+            _accum = 0;
+            _frames = 0;
+        }
+
+        watch.pollEvents();
+
         static unsigned int id = -1;
+
+        auto shapedText = shaper.shapeMultiline(*font, std::format("FPS: {}", (int)fps));
+        auto quads = atlasGroup.buildQuads(*font, shapedText);
 
         if (id == -1)
         {        
             glGenTextures(1, &id);
-            glBindTexture(GL_TEXTURE_2D, id);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-            glTexImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RGBA,
-                atlasGroup.page(0).width(), atlasGroup.page(0).height(),
-                0,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE,
-                atlasGroup.page(0).pixels().data()
-            );
         }
+        
+        glBindTexture(GL_TEXTURE_2D, id);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            atlasGroup.page(0).width(), atlasGroup.page(0).height(),
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            atlasGroup.page(0).pixels().data()
+        );
+        
 
         auto width = wnd->getWindowWidth();
         auto height = wnd->getWindowHeight();
@@ -82,6 +118,8 @@ int main()
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
+        glTranslated(0, height, 0);
+
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, id);
@@ -92,7 +130,7 @@ int main()
         glBegin(GL_TRIANGLES);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glColor4f(1, 1, 19, 1);
+        glColor4f(0.35f, 0.35f, 0.35f, 1);
 
         for (auto& q : quads)
         {
@@ -109,7 +147,6 @@ int main()
     });
 
     wnd->setTitle("Text editor");
-
     wnd->run();
     return 0;
 }
