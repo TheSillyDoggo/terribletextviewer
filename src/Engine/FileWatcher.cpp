@@ -102,3 +102,9 @@ void FileWatcher::pollEvents()
     }
 }
 #endif
+
+#ifdef PLATFORM_WINDOWS
+void FileWatcher::init() {}
+void FileWatcher::destroy() {}
+void FileWatcher::pollEvents() {}
+#endif
