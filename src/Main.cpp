@@ -55,7 +55,7 @@ int main()
     double _accum = 0;
     int _frames = 0;
 
-    wnd = Window::create([&wnd, &shaper, &font, &atlasGroup, &watch, &i, &fps, &_updateInterval, &_timeLeft, &_accum, &_frames]
+    wnd = Window::create([&wnd, &shaper, &font, &atlasGroup, &i, &fps, &_updateInterval, &_timeLeft, &_accum, &_frames]
     {
         double dt = wnd->getDeltaTime();
 
