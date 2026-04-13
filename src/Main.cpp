@@ -72,7 +72,7 @@ int main()
             _frames = 0;
         }
 
-        watch.pollEvents();
+        // watch.pollEvents();
 
         static unsigned int id = -1;
 
